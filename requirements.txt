@@ -1,12 +1,13 @@
+pip --upgrade pip
+pdfminer.six
+pyresparser
 streamlit
 pandas
-pafy
 plotly
 pymysql
 streamlit-tags
 Pillow
-nltk
-pdfminer.six
 yt-dlp
-spacy==2.3.5
-pyresparser	
+nltk
+spacy==3.5.3
+blis==0.7.9
