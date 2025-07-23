@@ -1,4 +1,3 @@
-pip --upgrade pip
 pdfminer.six
 pyresparser
 streamlit
@@ -11,3 +10,7 @@ yt-dlp
 nltk
 spacy==3.5.3
 blis==0.7.9
+rich
+markdown-it-py
+pygments
+mdurl
