@@ -138,10 +138,10 @@ def run():
                 
             st.subheader("**Skills Recommendation **")
                ## Skill shows
-            keywords = st_tags(label='### Skills that you have',
-                                 
-                                   value=resume_data['skills'], key='2')
+            skills = resume_data.get('skills', [])  # returns an empty list if 'skills' is missing or None
 
+            keywords = st_tags(label='### Skills that you have',
+                   value=skills, key='2')
                 ##  recommendation
             ds_keyword = ['tensorflow', 'keras', 'pytorch', 'machine learning', 'deep Learning', 'flask',
                               'streamlit']
@@ -157,7 +157,7 @@ def run():
 
             recommended_skills = []
                 ## Courses recommendation
-            for i in resume_data['skills']:
+            for i in skills:
                     ## Data science recommendation
                     if i.lower() in ds_keyword:
                         print(i.lower())
