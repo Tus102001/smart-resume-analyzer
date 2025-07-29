@@ -79,6 +79,13 @@ def run():
     st.sidebar.markdown("# Choose User") #streamlit
     activities = ["Normal User", "Admin"]
     choice = st.sidebar.selectbox("Choose among the given options:", activities)
+      # Debugging file existence here:
+    
+    st.write("Current working directory:", os.getcwd())
+    st.write("Files in current dir:", os.listdir('.'))
+    st.write("Files in 'Logo' folder:", os.listdir('./Logo') if os.path.exists('./Logo') else "Logo folder NOT found")
+
+        
     img = Image.open('./Logo/images.png')
     img = img.resize((250, 250))
     st.image(img)
