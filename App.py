@@ -118,22 +118,24 @@ def run():
 
             # Try extracting structured data
             try:
-                resume_data = ResumeParser(save_path).get_extracted_data()
+               resume_data = ResumeParser(save_path).get_extracted_data()
             except Exception as e:
-                st.warning("ResumeParser could not extract structured info.")
-                resume_data = {}
-            
-            if resume_data:
-                st.header("**Resume Analysis**")
-                st.success("Hello " + resume_data['name'])
-                st.subheader("**Your Basic info**")
-                try:
-                    st.text('Name: ' + resume_data['name'])
-                    st.text('Email: ' + resume_data['email'])
-                    st.text('Contact: ' + resume_data['mobile_number'])
-                    st.text('Resume pages: ' + str(resume_data['no_of_pages']))
-                except:
-                    pass
+               st.warning("ResumeParser could not extract structured info.")
+               resume_data = {}
+
+            if resume_data and resume_data.get('skills'):
+               st.header("**Resume Analysis**")
+               st.success("Hello " + resume_data.get('name', 'User'))
+               st.subheader("**Your Basic info**")
+            try:
+               st.text('Name: ' + resume_data.get('name', 'N/A'))
+               st.text('Email: ' + resume_data.get('email', 'N/A'))
+               st.text('Contact: ' + resume_data.get('mobile_number', 'N/A'))
+               st.text('Resume pages: ' + str(resume_data.get('no_of_pages', 'N/A')))
+            except:
+             pass
+            else:
+                st.warning("ResumeParser could not extract structured info or skills from the resume.")
                 
                 
             st.subheader("**Skills Recommendation **")
