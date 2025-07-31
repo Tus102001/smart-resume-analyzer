@@ -46,7 +46,10 @@ def pdf_reader(file):
     fake_file_handle.close()
     return text
 
-
+def show_pdf(file_path):
+    with open(file_path, "rb") as f:
+        PDFbyte = f.read()
+    st.download_button(label="Download Resume PDF", data=PDFbyte, file_name=os.path.basename(file_path))
 
 def get_similarity(resume_text, job_description):
     if resume_text and job_description:
@@ -87,13 +90,10 @@ def fallback_resume_data(text):
 def process_resume(save_path, resume_text):
     try:
         resume_data = ResumeParser(save_path).get_extracted_data()
-        st.write("📋 ResumeParser result:", resume_data)
-    except Exception as e:
-        st.warning("ResumeParser failed: Using fallback method.")
-        resume_data = {}
-
-    if not resume_data or not resume_data.get('skills'):
-        st.warning("Using fallback parser (manual extraction).")
+        # Do NOT show warning messages if parsing fails
+        if not resume_data or not resume_data.get('skills'):
+            resume_data = fallback_resume_data(resume_text)
+    except Exception:
         resume_data = fallback_resume_data(resume_text)
 
     if resume_data:
@@ -117,9 +117,10 @@ def run():
     activities = ["Normal User", "Admin"]
     choice = st.sidebar.selectbox("Choose among the given options:", activities)
 
-    img = Image.open('./Logo/images.png')
-    img = img.resize((250, 250))
-    st.image(img)
+    # Removed image preview as requested
+    # img = Image.open('./Logo/images.png')
+    # img = img.resize((250, 250))
+    # st.image(img)
 
     if choice == 'Normal User':
         pdf_file = st.file_uploader("Choose your Resume", type=["pdf", "docx", "doc"])
@@ -131,7 +132,7 @@ def run():
                 f.write(pdf_file.getbuffer())
 
             if file_extension == ".pdf":
-                #show_pdf(save_path)
+                show_pdf(save_path)  # Only show download button, no preview
                 resume_text = pdf_reader(save_path)
             elif file_extension in [".docx", ".doc"]:
                 doc = Document(save_path)
