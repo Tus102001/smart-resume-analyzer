@@ -103,7 +103,7 @@ def process_resume(save_path, resume_text):
         st.text('Name: ' + resume_data.get('name', 'N/A'))
         st.text('Email: ' + resume_data.get('email', 'N/A'))
         st.text('Contact: ' + resume_data.get('mobile_number', 'N/A'))
-        st.text('Resume pages: ' + str(resume_data.get('no_of_pages', 'N/A')))
+        st.text('Resume pages: ' + 1)
     else:
         st.warning("Could not extract any info from the resume.")
 
