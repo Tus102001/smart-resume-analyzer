@@ -46,11 +46,7 @@ def pdf_reader(file):
     fake_file_handle.close()
     return text
 
-def show_pdf(file_path):
-    with open(file_path, "rb") as f:
-        PDFbyte = f.read()
-    st.download_button(label="Download Resume PDF", data=PDFbyte, file_name=os.path.basename(file_path))
-    st.write("PDF preview is not supported inline due to browser restrictions. Please download and open.")
+
 
 def get_similarity(resume_text, job_description):
     if resume_text and job_description:
@@ -135,7 +131,7 @@ def run():
                 f.write(pdf_file.getbuffer())
 
             if file_extension == ".pdf":
-                show_pdf(save_path)
+                #show_pdf(save_path)
                 resume_text = pdf_reader(save_path)
             elif file_extension in [".docx", ".doc"]:
                 doc = Document(save_path)
