@@ -208,39 +208,55 @@ def run():
         ad_user = st.text_input("Username")
         ad_password = st.text_input("Password", type='password')
 
-        if st.button("Login"):
-            if ad_user == 'nikhil' and ad_password == 'Nik@123':
-                st.success("Welcome Group 6")
+        if ad_user == 'nikhil' and ad_password == 'Nik@123':
+    
 
-                folder_path = "./Uploaded_Resumes/"
-                resume_files = [f for f in os.listdir(folder_path) if f.endswith(".pdf")]
+          folder_path = "./Uploaded_Resumes/"
+    resume_files = [f for f in os.listdir(folder_path) if f.endswith((".pdf", ".docx", ".doc"))]
+ 
+    data = []
+    for idx, file in enumerate(resume_files, start=1):
+        file_path = os.path.join(folder_path, file)
 
-                data = []
-                for idx, file in enumerate(resume_files, start=1):
-                    # Extract resume data for each file (you might want to parse each file here)
-                    # For simplicity, this example uses placeholders
-                    name = "Name Placeholder"
-                    email = "Email Placeholder"
-                    timestamp = datetime.datetime.now() - datetime.timedelta(days=random.randint(0, 30))
-                    data.append({
-                        "ID": idx,
-                        "Name": name,
-                        "Email": email,
-                        "Timestamp": timestamp.strftime("%Y-%m-%d %H:%M:%S")
-                    })
+        # Extract text from resume
+        if file.endswith(".pdf"):
+            resume_text = pdf_reader(file_path)
+        elif file.endswith((".doc", ".docx")):
+            doc = Document(file_path)
+            resume_text = "\n".join([para.text for para in doc.paragraphs])
+        else:
+            resume_text = ""
 
-                df = pd.DataFrame(data)
-                st.markdown("### User's Resume Data")
-                st.dataframe(df, use_container_width=True)
+        # Use parser (with fallback)
+        try:
+            resume_data = ResumeParser(file_path).get_extracted_data()
+            if not resume_data or not resume_data.get("email"):
+                resume_data = fallback_resume_data(resume_text)
+        except Exception:
+            resume_data = fallback_resume_data(resume_text)
 
-                csv = df.to_csv(index=False).encode('utf-8')
-                st.download_button(
-                    label="Download Report",
-                    data=csv,
-                    file_name="resume_analysis_report.csv",
-                    mime="text/csv"
-                )
-            else:
-                st.error("Wrong ID & Password Provided")
+        name = resume_data.get("name", "N/A")
+        email = resume_data.get("email", "N/A")
+        timestamp = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
+
+        data.append({
+            "ID": idx,
+            "Name": name,
+            "Email": email,
+            "Timestamp": timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        })
+
+    df = pd.DataFrame(data)
+    st.markdown("### User's Resume Data")
+    st.dataframe(df, use_container_width=True)
+
+    csv = df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Download Report",
+        data=csv,
+        file_name="resume_analysis_report.csv",
+        mime="text/csv"
+    )
+
 
 run()
