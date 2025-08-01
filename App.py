@@ -118,9 +118,9 @@ def run():
     choice = st.sidebar.selectbox("Choose among the given options:", activities)
 
     # Removed image preview as requested
-    # img = Image.open('./Logo/images.png')
-    # img = img.resize((250, 250))
-    # st.image(img)
+    img = Image.open('./Logo/images.png')
+    img = img.resize((250, 250))
+    st.image(img)
 
     if choice == 'Normal User':
         pdf_file = st.file_uploader("Choose your Resume", type=["pdf", "docx", "doc"])
