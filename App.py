@@ -2,9 +2,8 @@ import streamlit as st
 import nltk
 nltk.download('punkt')
 nltk.download('stopwords')
-import spacy
-nltk.download('stopwords')
 
+import spacy
 try:
     nlp = spacy.load('en_core_web_sm')
 except OSError:
@@ -16,10 +15,9 @@ import pandas as pd
 import base64, random
 import time, datetime
 from pyresparser import ResumeParser
-from pdfminer.layout import LAParams, LTTextBox
+from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfinterp import PDFResourceManager
-from pdfminer.pdfinterp import PDFPageInterpreter
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 import io
 from streamlit_tags import st_tags
@@ -28,8 +26,6 @@ from sklearn.feature_extraction.text import CountVectorizer
 from Courses import ds_course, web_course, android_course, ios_course, uiux_course, resume_videos, interview_videos
 from sklearn.metrics.pairwise import cosine_similarity
 import os
-import datetime
-import random
 from docx import Document
 import re
 
@@ -90,7 +86,6 @@ def fallback_resume_data(text):
 def process_resume(save_path, resume_text):
     try:
         resume_data = ResumeParser(save_path).get_extracted_data()
-        # Do NOT show warning messages if parsing fails
         if not resume_data or not resume_data.get('skills'):
             resume_data = fallback_resume_data(resume_text)
     except Exception:
@@ -117,7 +112,6 @@ def run():
     activities = ["Normal User", "Admin"]
     choice = st.sidebar.selectbox("Choose among the given options:", activities)
 
-    # Removed image preview as requested
     img = Image.open('./Logo/images.png')
     img = img.resize((250, 250))
     st.image(img)
@@ -132,7 +126,7 @@ def run():
                 f.write(pdf_file.getbuffer())
 
             if file_extension == ".pdf":
-                show_pdf(save_path)  # Only show download button, no preview
+                show_pdf(save_path)
                 resume_text = pdf_reader(save_path)
             elif file_extension in [".docx", ".doc"]:
                 doc = Document(save_path)
@@ -146,8 +140,7 @@ def run():
             st.subheader("**Skills Recommendation**")
             skills = resume_data.get('skills', [])
 
-            keywords = st_tags(label='### Skills that you have',
-                   value=skills, key='2')
+            keywords = st_tags(label='### Skills that you have', value=skills, key='2')
 
             ds_keyword = ['tensorflow', 'keras', 'pytorch', 'machine learning', 'deep learning', 'flask', 'streamlit']
             web_keyword = ['react', 'django', 'node js', 'react js', 'php', 'laravel', 'magento', 'wordpress',
@@ -164,36 +157,28 @@ def run():
 
             for i in skills:
                 if i.lower() in ds_keyword:
-                    reco_field = 'Data Science'
                     recommended_skills = ['Data Visualization', 'Predictive Analysis', 'Statistical Modeling',
                                           'Data Mining', 'Clustering & Classification', 'Data Analytics',
                                           'Quantitative Analysis', 'Web Scraping', 'ML Algorithms', 'Keras',
                                           'Pytorch', 'Probability', 'Scikit-learn', 'Tensorflow', "Flask",
                                           'Streamlit']
-                    recommended_keywords = st_tags(label='### Recommended skills for you.',
-                                                  value=recommended_skills, key='3')
+                    st_tags(label='### Recommended skills for you.', value=recommended_skills, key='3')
                     break
                 elif i.lower() in web_keyword:
-                    reco_field = 'Web Development'
                     recommended_skills = ['React', 'Django', 'Node JS', 'React JS', 'php', 'laravel', 'Magento',
                                           'wordpress', 'Javascript', 'Angular JS', 'c#', 'Flask', 'SDK']
-                    recommended_keywords = st_tags(label='### Recommended skills for you.',
-                                                  value=recommended_skills, key='4')
+                    st_tags(label='### Recommended skills for you.', value=recommended_skills, key='4')
                     break
                 elif i.lower() in android_keyword:
-                    reco_field = 'Android Development'
                     recommended_skills = ['Android', 'Android development', 'Flutter', 'Kotlin', 'XML', 'Java',
                                           'Kivy', 'GIT', 'SDK', 'SQLite']
-                    recommended_keywords = st_tags(label='### Recommended skills for you.',
-                                                  value=recommended_skills, key='5')
+                    st_tags(label='### Recommended skills for you.', value=recommended_skills, key='5')
                     break
                 elif i.lower() in ios_keyword:
-                    reco_field = 'IOS Development'
                     recommended_skills = ['IOS', 'IOS Development', 'Swift', 'Cocoa', 'Cocoa Touch', 'Xcode',
                                           'Objective-C', 'SQLite', 'Plist', 'StoreKit', "UI-Kit", 'AV Foundation',
                                           'Auto-Layout']
-                    recommended_keywords = st_tags(label='### Recommended skills for you.',
-                                                  value=recommended_skills, key='6')
+                    st_tags(label='### Recommended skills for you.', value=recommended_skills, key='6')
                     break
 
             st.subheader("Paste the Job Description")
@@ -217,10 +202,22 @@ def run():
 
                 data = []
                 for idx, file in enumerate(resume_files, start=1):
-                    # Extract resume data for each file (you might want to parse each file here)
-                    # For simplicity, this example uses placeholders
-                    name = "Name Placeholder"
-                    email = "Email Placeholder"
+                    save_path = os.path.join(folder_path, file)
+
+                    try:
+                        resume_text = pdf_reader(save_path)
+                        resume_data = ResumeParser(save_path).get_extracted_data()
+
+                        if not resume_data or not resume_data.get('name'):
+                            resume_data = fallback_resume_data(resume_text)
+
+                        name = resume_data.get('name', 'N/A')
+                        email = resume_data.get('email', 'N/A')
+
+                    except Exception:
+                        name = "Parse Error"
+                        email = "Parse Error"
+
                     timestamp = datetime.datetime.now() - datetime.timedelta(days=random.randint(0, 30))
                     data.append({
                         "ID": idx,
